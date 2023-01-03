@@ -1,0 +1,156 @@
+#!/bin/bash
+
+### BEGIN INIT INFO
+# Provides:          rc.firewall
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start firewall on boot time
+# Description:       Starting iptables based firewall
+### END INIT INFO
+
+
+CONFILE="/opt/scripts/rc.firewall.conf"
+
+. $CONFILE
+
+
+firewall_start() {
+
+   $IPT -t filter -F INPUT
+   #$IPT -t filter -X PUBLIC
+
+   #----------------
+   # We/Wy na Serwer
+   #----------------
+
+$IPT -N PUBLIC
+
+
+#$IPT -N SSHALLOW
+#$IPT -N HTTPALLOW
+#$IPT -N HTTPSALLOW
+
+
+
+#sshchanin
+#for item in ${SSHALLOWHOSTS[*]}
+#        do
+#                $IPT -A SSHALLOW -s $item -j ACCEPT   
+#        done
+#$IPT -A SSHALLOW -j DROP
+
+#httpchain
+#for item in ${HTTPALLOWHOSTS[*]}
+#        do
+#                $IPT -A HTTPALLOW -s $item -j ACCEPT
+#        done
+#$IPT -A HTTPALLOW -j DROP
+
+#httpschain
+#for item in ${HTTPSALLOWHOSTS[*]}
+#        do
+#                $IPT -A HTTPSALLOW -s $item -j ACCEPT
+#        done
+#$IPT -A HTTPSALLOW -j DROP
+
+
+
+
+# we/wy interface-u lo
+$IPT -A INPUT -j ACCEPT -i lo
+$IPT6 -A INPUT -j ACCEPT -i lo
+$IPT -A OUTPUT -j ACCEPT -o lo
+
+
+# Allow all conection via LAN
+$IPT -A INPUT -j ACCEPT -i ens4
+$IPT -A OUTPUT -j ACCEPT -o ens4
+
+#allowall
+for item in ${ALLOWALLHOSTS[*]}
+        do
+                $IPT -A INPUT -s $item -i $PUBLIC_IF -j ACCEPT
+
+
+        done
+
+#allow internet
+for ((i = 0; i < ${#ALLOWPUBLIC[@]}; i++))
+        do
+
+                $IPT -A PUBLIC -j ACCEPT ${ALLOWPUBLIC[$i]}
+        done
+
+
+
+
+$IPT -A PUBLIC -j ACCEPT -m state --state ESTABLISHED,RELATED
+#$IPT -A PUBLIC -p tcp --dport 22 -j SSHALLOW
+#$IPT -A PUBLIC -p tcp --dport 80 -j ACCEPT
+#$IPT -A PUBLIC -p tcp --dport 443 -j ACCEPT
+#$IPT -A PUBLIC -p icmp -j ACCEPT
+$IPT -A PUBLIC -j DROP
+
+
+# wpuszczenie nawiazanych polaczen
+$IPT -A INPUT -j ACCEPT -m state --state ESTABLISHED,RELATED
+
+
+$IPT -A INPUT -i $PUBLIC_IF -j PUBLIC
+
+
+
+   $IPT -P INPUT DROP
+   $IPT6 -P INPUT DROP
+   $IPT -P OUTPUT ACCEPT
+   $IPT6 -P OUTPUT ACCEPT
+   $IPT -P FORWARD DROP
+   $IPT6 -P FORWARD DROP
+
+   if [ $FAIL2BAN_ENABLE == "1" ]
+        then
+                /etc/init.d/fail2ban restart
+        fi
+
+}
+
+
+firewall_stop() {
+
+   $IPT -t filter -F INPUT
+   $IPT -t filter -F PUBLIC
+   $IPT -t filter -X PUBLIC
+   #$IPT -F -t nat
+
+   $IPT -P INPUT ACCEPT
+   $IPT -P OUTPUT ACCEPT
+   $IPT -P FORWARD ACCEPT
+
+   $IPT6 -P INPUT ACCEPT
+   $IPT6 -P FORWARD ACCEPT
+   $IPT6 -P OUTPUT ACCEPT
+
+   #$IPT6 -F
+   #$IPT6 -t mangle -F
+
+   #$IPT6 -X
+   #$IPT6 -X -t mangle
+
+}
+
+case "$1" in
+'start')
+        firewall_start
+        ;;
+'stop')
+        firewall_stop
+        ;;
+'restart')
+        firewall_stop
+        firewall_start
+        ;;
+*)
+        echo "usage $0 start|stop|restart"
+esac

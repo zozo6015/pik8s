@@ -1,0 +1,11 @@
+# /etc/systemd/system/firewall.service
+[Unit]
+Description=Firewall
+
+[Service]
+ExecStart=/opt/scripts/rc.firewall start
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+---
+- name: netfilter-persistent start
+  systemd:
+    name: netfilter-persistent
+    enabled: yes
+    state: started
+
+- name: Start firewall
+  systemd:
+    name: firewall
+    enabled: yes
+    state: started

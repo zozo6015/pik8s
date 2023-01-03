@@ -1,0 +1,74 @@
+---
+- name: install cri-o runtime
+  block:
+    - name: create crio.conf file
+      file:
+        path: /etc/modules-load.d/crio.conf
+        state: touch
+
+    - name: add content to crio.conf
+      lineinfile:
+        path: /etc/modules-load.d/crio.conf
+        line: '{{ item }}'
+        state: present
+      with_items:
+        - overlay
+        - br_netfilter
+
+    - name: enable the modules without reboot
+      shell: modprobe {{ item }}
+      with_items:
+        - overlay
+        - br_netfilter
+
+    - name: create 00-kubernetes-cri.conf
+      file:
+        path: /etc/sysctl.d/99-kubernetes-cri.conf
+        state: touch
+
+    - name: add crio related kernel settings
+      lineinfile:
+        path: /etc/sysctl.d/99-kubernetes-cri.conf
+        line: '{{ item }}'
+      with_items:
+        - 'net.bridge.bridge-nf-call-iptables  = 1'
+        - 'net.ipv4.ip_forward                 = 1'
+        - 'net.bridge.bridge-nf-call-ip6tables = 1'
+
+    - name: activate the kernel settings
+      shell: sysctl --system
+
+    - name: add cri-o stable repository key
+      ansible.builtin.apt_key:
+        url: 'https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ OS }}/Release.key'
+        state: present
+
+    - name: add cri-o version repository key
+      ansible.builtin.apt_key:
+        url: 'https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ VERSION }}/{{ OS }}/Release.key'
+        state: present
+
+
+    - name: add cri-o stable repository
+      ansible.builtin.apt_repository:
+        repo: 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ OS }}/ /'
+        filename: 'devel:kubic:libcontainers:stable.list'
+
+    - name: add cri-o version repository
+      ansible.builtin.apt_repository:
+        repo: 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ VERSION }}/{{ OS }}/ /'
+        filename: 'devel:kubic:libcontainers:stable:cri-o:{{ VERSION }}'
+
+    - name: install cri-o runtime
+      apt:
+        name: ['cri-o', 'cri-o-runc']
+        state: present
+        update_cache: yes
+    
+#    - name: add cri-o cgroup driver
+#      copy:
+#        src: 02-cgroup-manager.conf
+#        dest: /etc/crio/crio.conf.d/02-cgroup-manager.conf
+#      notify:
+#        - daemon-reload
+#        - start crio 

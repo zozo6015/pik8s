@@ -1,0 +1,10 @@
+---
+- name: daemon-reload
+  systemd:
+    daemon-reload: yes
+
+- name: start crio
+  systemd:
+    name: crio
+    state: restarted
+    enabled: true

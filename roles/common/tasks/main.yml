@@ -1,0 +1,92 @@
+---
+- name: configure ansible hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: upgrade the apt servers
+  apt:
+    update_cache: true
+    upgrade: full
+
+- name: Copy the modules configs
+  copy:
+    src: k8s.conf
+    dest: /etc/modules-load.d/k8s.conf
+
+- name: Copy sysctl config file
+  copy:
+    src: k8s-crio.conf
+    dest: /etc/sysctl.d/90-k8s-crio.conf
+
+- name: enable cgroup memory on raspberry pi
+  block:
+    - name: read the content of the cmdline.txt
+      shell: cat /boot/firmware/cmdline.txt
+      register: cmdline
+      when: ansible_architecture == "aarch64"
+
+    - debug: var=cmdline
+      when: ansible_architecture == "aarch64"
+
+    - name: write new cmdline
+      lineinfile:
+        path: /boot/firmware/cmdline.txt
+        regex: '^dwc_otg.lpm.*'
+        line: '{{ cmdline.stdout }} cgroup_enable=memory cgroup_memory=1'
+        state: present
+      when: ansible_architecture == "aarch64" and not cmdline.stdout is search("cgroup_enable")
+
+- name: install necesarry packages
+  apt:
+    name: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg-agent', 'software-properties-common', 'nfs-common', 'netfilter-persistent', 'lvm2']
+    state: present
+    update_cache: yes
+
+- name: create scripts folder for firewall config
+  file:
+    path: /opt/scripts
+    state: directory
+  when: firewall_enabled == true
+
+- name: copy the firewall scripts into place
+  copy:
+    src: "{{ item }}"
+    dest: /opt/scripts
+  with_items:
+    - rc.firewall
+    - rc.firewall.conf
+  when: firewall_enabled == true
+
+- name: make rc.firewall script executable
+  file:
+    path: /opt/scripts/rc.firewall
+    mode: 0755
+    owner: root
+    group: root
+    state: file
+  when: firewall_enabled == true
+
+- name: installing systemctl unit file
+  copy:
+    src: firewall.service
+    dest: /etc/systemd/system/firewall.service
+  when: firewall_enabled == true
+  notify: Start firewall
+
+- name: Generate hosts entry to /etc/hosts
+  shell: echo "$(hostname -I | xargs -n1 | grep ^192.) $(hostname).redcapcloud.com $(hostname)"
+  register: hosts
+
+- debug: var=hosts
+
+- name: Generate hostname
+  shell: hostname
+  register: hostname
+
+- name: add hostname private ip mapping to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: '{{ hostname.stdout }}'
+    line: '{{ hosts.stdout }}'
+    state: present
+  

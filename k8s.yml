@@ -1,0 +1,14 @@
+---
+- hosts: all
+#  user: ubuntu
+  become: true
+  roles:
+    - common
+ 
+- hosts:
+    - master
+    - workers
+  roles:
+#    - docker
+    - k8s
+    - crio

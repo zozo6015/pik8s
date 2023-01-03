@@ -1,0 +1,21 @@
+---
+- name: add docker
+  block:
+    - name: add docker repo.key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: add docker repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/debian buster stable"
+        state: present
+
+    - name: install docker packages
+      apt: 
+        name: ['docker-ce=5:19.03.15~3-0~debian-buster', 'docker-ce-cli=5:19.03.15~3-0~debian-buster', 'containerd.io']
+        state: present
+        update_cache: true
+      notify: 
+        - start docker
+        - start containerd
