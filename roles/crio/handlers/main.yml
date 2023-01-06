@@ -6,5 +6,9 @@
 - name: start crio
   systemd:
     name: crio
-    state: restarted
     enabled: true
+
+- name: start crio
+  systemd:
+    name: crio
+    status: started

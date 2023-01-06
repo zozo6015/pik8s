@@ -74,7 +74,7 @@
   notify: Start firewall
 
 - name: Generate hosts entry to /etc/hosts
-  shell: echo "$(hostname -I | xargs -n1 | grep ^192.) $(hostname).redcapcloud.com $(hostname)"
+  shell: echo "$(hostname -I | xargs -n1 | grep ^192.) $(hostname).{{ domain }} $(hostname)"
   register: hosts
 
 - debug: var=hosts

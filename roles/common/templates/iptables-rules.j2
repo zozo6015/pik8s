@@ -14,8 +14,8 @@
 -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
 -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,ACK SYN -m conntrack --ctstate NEW -j TCP
 -A INPUT -p tcp -m tcp --dport 22 -m conntrack --ctstate NEW -m comment --comment "ACCESS from ssh" -j TCP
--A INPUT -p tcp -m tcp -s 35.170.25.173/32 -m conntrack --ctstate NEW -m comment --comment "ACCESS from VPN" -j TCP
--A INPUT -p tcp -m tcp -s 158.69.221.237/32 -m conntrack --ctstate NEW -m comment --comment "ACCESS from citadel" -j TCP
+#-A INPUT -p tcp -m tcp -s 35.170.25.173/32 -m conntrack --ctstate NEW -m comment --comment "ACCESS from VPN" -j TCP
+#-A INPUT -p tcp -m tcp -s 158.69.221.237/32 -m conntrack --ctstate NEW -m comment --comment "ACCESS from citadel" -j TCP
 -A INPUT -p tcp -m tcp --dport 80 -m conntrack --ctstate NEW -m comment --comment "ACCESS from http" -j TCP
 -A INPUT -p tcp -m tcp --dport 443 -m conntrack --ctstate NEW -m comment --comment "ACCESS from https" -j TCP 
 COMMIT
