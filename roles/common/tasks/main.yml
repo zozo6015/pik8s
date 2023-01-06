@@ -8,6 +8,10 @@
     update_cache: true
     upgrade: full
 
+- name: install python3-apt package
+  shell: apt install -y python3-apt
+
+
 - name: Copy the modules configs
   copy:
     src: k8s.conf
