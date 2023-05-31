@@ -1,0 +1,14 @@
+---
+- name: Add haproxy repository
+  apt_repository:
+    repo: deb http://deb.debian.org/debian bullseye-backports main
+    state: present
+    file: haproxy
+    update_cache: true
+    
+- name: Install haproxy packages
+  apt:
+    name: haproxy=2.6.\*
+    state: latest
+    default_release: bullseye-backports
+    
