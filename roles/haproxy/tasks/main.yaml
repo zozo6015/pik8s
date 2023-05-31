@@ -12,3 +12,8 @@
     state: latest
     default_release: bullseye-backports
     
+- name: generate haproxy config file
+  templates:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify: haproxy restart
