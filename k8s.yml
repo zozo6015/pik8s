@@ -24,4 +24,4 @@
 - hosts: lb
   become: true
   roles:
-    - lb
+    - haproxy
