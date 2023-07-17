@@ -1,0 +1,13 @@
+---
+- name: install iptables-persistent
+  apt:
+    name: iptables-persistent
+    state: present
+
+- name: create rules.v4 file from template
+  template:
+    src: rules.v4.j2
+    dest: /etc/iptables/rules.v4
+
+- name: load iptables rules
+  shell: netfilter-persistent reload

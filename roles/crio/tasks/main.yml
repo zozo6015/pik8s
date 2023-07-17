@@ -64,6 +64,9 @@
         name: ['cri-o', 'cri-o-runc']
         state: present
         update_cache: yes
+  notify:
+    - daemon-reload
+    - start crio
     
 #    - name: add cri-o cgroup driver
 #      copy:

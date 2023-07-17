@@ -4,7 +4,15 @@
   become: true
   roles:
     - common
- 
+
+- hosts: all
+  become: true
+  tasks:
+    - name: run firewall
+      include_role:
+        name: firewall
+      when: firewall_enabled|bool == true
+
 - hosts:
     - master
     - workers
@@ -12,3 +20,8 @@
 #    - docker
     - k8s
     - crio
+
+- hosts: lb
+  become: true
+  roles:
+    - lb

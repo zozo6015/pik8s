@@ -46,51 +46,19 @@
     state: present
     update_cache: yes
 
-- name: create scripts folder for firewall config
-  file:
-    path: /opt/scripts
-    state: directory
-  when: firewall_enabled == true
-
-- name: copy the firewall scripts into place
-  copy:
-    src: "{{ item }}"
-    dest: /opt/scripts
-  with_items:
-    - rc.firewall
-    - rc.firewall.conf
-  when: firewall_enabled == true
-
-- name: make rc.firewall script executable
-  file:
-    path: /opt/scripts/rc.firewall
-    mode: 0755
-    owner: root
-    group: root
-    state: file
-  when: firewall_enabled == true
-
-- name: installing systemctl unit file
-  copy:
-    src: firewall.service
-    dest: /etc/systemd/system/firewall.service
-  when: firewall_enabled == true
-  notify: Start firewall
-
 - name: Generate hosts entry to /etc/hosts
-  shell: echo "$(hostname -I | xargs -n1 | grep ^192.) $(hostname).{{ domain }} $(hostname)"
-  register: hosts
+  template: 
+    src: hosts.j2
+    dest: /etc/hosts
 
-- debug: var=hosts
+#- name: Generate hostname
+#  shell: hostname
+#  register: hostname
 
-- name: Generate hostname
-  shell: hostname
-  register: hostname
-
-- name: add hostname private ip mapping to /etc/hosts
-  lineinfile:
-    path: /etc/hosts
-    regexp: '{{ hostname.stdout }}'
-    line: '{{ hosts.stdout }}'
-    state: present
-  
+#- name: add hostname private ip mapping to /etc/hosts
+#  lineinfile:
+#    path: /etc/hosts
+#    regexp: '{{ hostname.stdout }}'
+#    line: '{{ hosts.stdout }}'
+#    state: present
+#  
