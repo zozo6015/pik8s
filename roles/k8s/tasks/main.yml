@@ -14,11 +14,27 @@
 
     - name: install k8s related software
       apt:
-        name: ['kubeadm={{ K8S_VERSION }}', 'kubelet={{ K8S_VERSION }}', 'kubectl={{ K8S_VERSION }}']
+        name: ['kubeadm={{ K8S_VERSION }}', 'kubelet={{ K8S_VERSION }}', 'kubectl={{ K8S_VERSION }}', 'ipset', 'ipvsadm']
         state: present
         update_cache: true
       notify:
         - start kubelet
+
+    - name: install ipvs mode modules
+      modprobe:
+        name: '{{ item }}'
+        state: present
+      loop:
+        - ip_vs
+        - ip_vs_rr
+        - ip_vs_wrr
+        - ip_vs_sh
+        - nf_conntrack
+
+    - name: persist ipvs modules
+      copy:
+        src: ipvs.conf
+        dest: /etc/modules-load.d/ipvs.conf
 
     - name: get the status of kubeadm package
       shell: dpkg --get-selections | grep kubeadm

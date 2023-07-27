@@ -3,17 +3,26 @@
   apt_repository:
     repo: deb http://deb.debian.org/debian bullseye-backports main
     state: present
-    file: haproxy
+    filename: haproxy
     update_cache: true
+  when: ansible_distribution == "Debian"
+
+- name: Add haproxy repository
+  apt_repository:
+    repo: ppa:vbernat/haproxy-2.8
+    state: present
+    filename: haproxy
+    update_cache: true
+  when: ansible_distribution == "Ubuntu"
     
 - name: Install haproxy packages
   apt:
-    name: haproxy=2.6.\*
+    name: haproxy=2.8.\*
     state: latest
     default_release: bullseye-backports
     
 - name: generate haproxy config file
-  templates:
+  template:
     src: haproxy.cfg.j2
     dest: /etc/haproxy/haproxy.cfg
   notify: haproxy restart

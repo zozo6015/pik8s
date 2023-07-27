@@ -1,16 +1,16 @@
 [all]
-k8s-m-01 ansible_host=10.1.0.6 ansible_port=22
-01-k8s-s ansible_host=10.1.0.7 ansible_port=22
-02-k8s-s ansible_host=10.1.0.8 ansible_port=22
-03-k8s-s ansible_host=10.1.0.15 ansible_port=22
+01-ny2-master ansible_host=162.220.52.109 ansible_port=22
+01-ny2-worker ansible_host=162.220.52.89 ansible_port=22
+02-ny2-worker ansible_host=162.220.52.95 ansible_port=22
+03-ny2-worker ansible_host=162.220.52.105 ansible_port=22
 
 [lb]
 
 
 [master]
-k8s-m-01 ansible_host=10.1.0.6 ansible_port=22
+01-ny2-master ansible_host=162.220.52.109 ansible_port=22
 
 [workers]
-01-k8s-s ansible_host=10.1.0.7 ansible_port=22
-02-k8s-s ansible_host=10.1.0.8 ansible_port=22
-03-k8s-s ansible_host=10.1.0.15 ansible_port=22
+01-ny2-worker ansible_host=162.220.52.89 ansible_port=22
+02-ny2-worker ansible_host=162.220.52.95 ansible_port=22
+03-ny2-worker ansible_host=162.220.52.105 ansible_port=22

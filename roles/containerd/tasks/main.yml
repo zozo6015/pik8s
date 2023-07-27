@@ -1,0 +1,33 @@
+---
+- name: add docker
+  block:
+    - name: add docker repo.key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg
+        state: present
+
+    - name: add docker repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release|lower }} stable"
+        state: present
+
+    - name: install docker packages
+      apt: 
+        name: 'containerd.io'
+        state: present
+        update_cache: true
+
+    - name: copy containerd config file
+      copy:
+        src: config.toml
+        dest: /etc/containerd/config.toml
+
+    - name: enable cgroup for containerd
+      lineinfile:
+        regex: 'SystemdCgroup = false'
+        line: 'SystemdCgroup = true'
+        state: present
+        path: /etc/containerd/config.tom
+      notify:
+      - enable containerd
+      - restart containerd

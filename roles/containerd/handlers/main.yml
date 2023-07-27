@@ -1,0 +1,11 @@
+---
+
+- name: enable containerd
+  systemd:
+    name: containerd
+    enabled: true
+
+- name: restart containerd
+  systemd:
+    name: containerd
+    state: restarted

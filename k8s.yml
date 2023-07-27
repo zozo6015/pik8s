@@ -3,25 +3,42 @@
 #  user: ubuntu
   become: true
   roles:
-    - common
+  - common
 
 - hosts: all
   become: true
   tasks:
-    - name: run firewall
-      include_role:
-        name: firewall
-      when: firewall_enabled|bool == true
+  - name: run firewall
+    include_role:
+      name: firewall
+    when: firewall_enabled|bool == true
 
 - hosts:
-    - master
-    - workers
+  - master
+  - workers
+  become: true
   roles:
-#    - docker
-    - k8s
-    - crio
+  - k8s
+
+- hosts:
+  - master
+  - workers
+  become: true
+  roles:
+  - containerd
+  tags:
+  - containerd
+
+- hosts:
+  - master
+  - workers
+  become: true
+  roles:
+  - crio
+  tags:
+  - crio
 
 - hosts: lb
   become: true
   roles:
-    - haproxy
+  - haproxy

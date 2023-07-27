@@ -17,10 +17,21 @@
     src: k8s.conf
     dest: /etc/modules-load.d/k8s.conf
 
+- name: enable kernel modules
+  modprobe: 
+    name: '{{ item }}'
+    state: present
+  loop:
+    - overlay
+    - br_netfilter
+
 - name: Copy sysctl config file
   copy:
-    src: k8s-crio.conf
-    dest: /etc/sysctl.d/90-k8s-crio.conf
+    src: kubernetes.conf
+    dest: /etc/sysctl.d/kubernetes.conf
+
+- name: load sysctl config
+  shell: sysctl --system
 
 - name: enable cgroup memory on raspberry pi
   block:
