@@ -1,7 +1,10 @@
 ---
+- name: Add haproxy repo key
+  shell: https://haproxy.debian.net/bernat.debian.org.gpg | gpg --dearmor > /usr/share/keyrings/haproxy.debian.net.gpg 
+  
 - name: Add haproxy repository
   apt_repository:
-    repo: deb http://deb.debian.org/debian bullseye-backports main
+    repo: 'deb "[signed-by=/usr/share/keyrings/haproxy.debian.net.gpg]" http://haproxy.debian.net bookworm-backports-2.8 main'
     state: present
     filename: haproxy
     update_cache: true
@@ -9,7 +12,7 @@
 
 - name: Add haproxy repository
   apt_repository:
-    repo: ppa:vbernat/haproxy-2.8
+    repo: ppa:vbernat/haproxy-2.8.\*
     state: present
     filename: haproxy
     update_cache: true
@@ -19,7 +22,6 @@
   apt:
     name: haproxy=2.8.\*
     state: latest
-    default_release: bullseye-backports
     
 - name: generate haproxy config file
   template:
