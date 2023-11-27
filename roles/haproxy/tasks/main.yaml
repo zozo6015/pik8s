@@ -1,6 +1,6 @@
 ---
 - name: Add haproxy repo key
-  shell: https://haproxy.debian.net/bernat.debian.org.gpg | gpg --dearmor > /usr/share/keyrings/haproxy.debian.net.gpg 
+  shell: curl https://haproxy.debian.net/bernat.debian.org.gpg | gpg --dearmor > /usr/share/keyrings/haproxy.debian.net.gpg 
   
 - name: Add haproxy repository
   apt_repository:
