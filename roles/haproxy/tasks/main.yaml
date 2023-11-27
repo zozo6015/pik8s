@@ -18,10 +18,10 @@
     update_cache: true
   when: ansible_distribution == "Ubuntu"
     
-- name: Install haproxy packages
-  apt:
-    name: 'haproxy=2.8.\*'
-    state: latest
+#- name: Install haproxy packages
+#  apt:
+#    name: 'haproxy=2.8.\*'
+#    state: latest
     
 - name: generate haproxy config file
   template:
