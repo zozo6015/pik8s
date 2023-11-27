@@ -27,7 +27,7 @@
         regex: 'SystemdCgroup = false'
         line: 'SystemdCgroup = true'
         state: present
-        path: /etc/containerd/config.tom
+        path: /etc/containerd/config.toml
       notify:
       - enable containerd
       - restart containerd
