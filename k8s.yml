@@ -1,12 +1,12 @@
 ---
 - hosts: all
 #  user: ubuntu
-  become: true
+  become: false
   roles:
   - common
 
 - hosts: all
-  become: true
+  become: false
   tasks:
   - name: run firewall
     include_role:
@@ -16,14 +16,14 @@
 - hosts:
   - master
   - workers
-  become: true
+  become: false
   roles:
   - k8s
 
 - hosts:
   - master
   - workers
-  become: true
+  become: false
   roles:
   - containerd
   tags:
@@ -32,13 +32,13 @@
 - hosts:
   - master
   - workers
-  become: true
+  become: false
   roles:
   - crio
   tags:
   - crio
 
 - hosts: lb
-  become: true
+  become: false
   roles:
   - haproxy
