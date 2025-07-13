@@ -1,5 +1,5 @@
 OS: xUbuntu_22.04
-VERSION: 1.33
-PATCH: 1.26.7
-K8S_VERSION:  1.26.7-00
+VERSION: v1.33
+PATCH: 1.33.2-1.1
+K8S_VERSION:  1.33.2-1.1
 domain: 'veracityid.com'

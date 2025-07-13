@@ -29,16 +29,16 @@
   tags:
   - containerd
 
-- hosts:
-  - master
-  - workers
-  become: false
-  roles:
-  - crio
-  tags:
-  - crio
+#- hosts:
+#  - master
+#  - workers
+#  become: false
+#  roles:
+#  - crio
+#  tags:
+#  - crio
 
-- hosts: lb
-  become: false
-  roles:
-  - haproxy
+#- hosts: lb
+#  become: false
+#  roles:
+#  - haproxy
