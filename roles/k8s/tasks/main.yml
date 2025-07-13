@@ -1,8 +1,28 @@
 ---
 - name: install kubernetes required software
   block:
-    - name: install kubernetes repo_key
-      ansible.shell: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    - name: Ensure /etc/apt/keyrings directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download Kubernetes apt signing key
+      ansible.builtin.get_url:
+        url: https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key
+        dest: /tmp/kubernetes-release.key
+        mode: '0644'
+
+    - name: Add Kubernetes apt signing key
+      ansible.builtin.shell: |
+        gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/kubernetes-release.key
+        args:
+        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    - name: Remove temporary key file
+      ansible.builtin.file:
+        path: /tmp/kubernetes-release.key
+        state: absent
 
     - name: add k8s repository
       ansible.builtin.apt_repository:
